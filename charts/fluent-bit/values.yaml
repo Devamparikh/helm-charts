@@ -280,8 +280,8 @@ config:
   service: |
     [SERVICE]
         Daemon Off
-        Flush {{ .Values.flush }}
-        Log_Level {{ .Values.logLevel }}
+        Flush 5
+        Log_Level info
         Parsers_File parsers.conf
         Parsers_File custom_parsers.conf
         HTTP_Server On
@@ -291,6 +291,10 @@ config:
 
   ## https://docs.fluentbit.io/manual/pipeline/inputs
   inputs: |
+    [INPUT]
+        Name cpu
+        Tag my_cpu
+    
     [INPUT]
         Name tail
         Path /var/log/containers/*.log
@@ -318,9 +322,13 @@ config:
   ## https://docs.fluentbit.io/manual/pipeline/outputs
   outputs: |
     [OUTPUT]
-        Name es
-        Match kube.*
-        Host elasticsearch-master
+        Name opensearch
+        Match *
+        Host 172.20.226.52
+        port 9200
+        index security-auditlog-2022.10.12
+        type _doc
+        
         Logstash_Format On
         Retry_Limit False
 
